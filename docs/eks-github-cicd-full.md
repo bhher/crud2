@@ -529,13 +529,43 @@ git remote add origin https://github.com/<사용자명>/crud2.git
 git branch -M main
 ```
 
+> **아직 GitHub에는 코드가 안 올라간다.** `git push`는 **17~18단계(Workflow·Secrets) 후 19단계**에서 한다.  
 > `.pem` 키, `.env`, RDS 비밀번호는 **절대 커밋하지 않는다.** `.gitignore`에 `*.tar`, `*.pem` 등이 포함되어 있는지 확인한다.
 
 ---
 
 ## 17. GitHub Actions Workflow 작성
 
-프로젝트에 `.github/workflows/deploy-eks.yml` 파일을 만든다.
+프로젝트에 **이미 포함**된 Workflow 파일을 확인한다.
+
+### 파일 위치
+
+```
+d:\crud2\
+├── .github\
+│   └── workflows\
+│       └── deploy-eks.yml    ← GitHub Actions 정의
+├── k8s\
+├── Dockerfile
+└── ...
+```
+
+| 항목 | 값 |
+|------|-----|
+| 경로 | `.github/workflows/deploy-eks.yml` |
+| 트리거 | `main` 브랜치에 `git push` |
+| 대상 | ECR push → EKS `crud2` Deployment Rolling Update |
+
+로컬에서 내용 확인:
+
+```powershell
+cd d:\crud2
+Get-Content .github\workflows\deploy-eks.yml
+```
+
+### Workflow 전체 내용
+
+파일이 없을 때만 아래와 같이 생성한다. (저장소에 있으면 **수정만** 하면 된다.)
 
 ```yaml
 name: Deploy to EKS
@@ -595,14 +625,16 @@ jobs:
 
 ### Workflow가 하는 일
 
-| 단계 | 내용 |
-|------|------|
-| 트리거 | `main` 브랜치에 `git push` |
-| 빌드 | Docker 멀티 스테이지 (`Dockerfile` 내 Gradle `bootJar`) |
-| ECR | 로그인 → 이미지 push (`latest` + 커밋 SHA 태그) |
-| 배포 | `kubectl set image` → Deployment Rolling Update |
+| 순서 | Actions 단계 | 내용 |
+|------|-------------|------|
+| 1 | Checkout | 소스 코드 받기 |
+| 2 | Configure AWS credentials | GitHub Secrets의 IAM 키 사용 |
+| 3 | Login to ECR | ECR 로그인 |
+| 4 | Build, tag, push | `docker build` → ECR push (`latest` + 커밋 SHA) |
+| 5 | Update kubeconfig | EKS `crud2-cluster` 연결 |
+| 6 | Deploy to EKS | `kubectl set image` → Rolling Update |
 
-> MySQL·Service는 **최초 1회 수동 apply**(12~14단계) 후, CI/CD는 **crud2 앱 이미지만** 갱신한다.
+> MySQL·LoadBalancer Service는 **최초 1회 수동 apply**(12~14단계) 후, CI/CD는 **crud2 앱 이미지만** 갱신한다.
 
 ---
 
@@ -785,7 +817,7 @@ aws ecr delete-repository --repository-name crud2 --force --region ap-northeast-
 | `k8s/mysql.yaml` | MySQL Deployment + Service |
 | `k8s/deployment.yaml` | crud2 앱 Deployment |
 | `k8s/service.yaml` | LoadBalancer Service |
-| `.github/workflows/deploy-eks.yml` | GitHub Actions (17단계에서 생성) |
+| `.github/workflows/deploy-eks.yml` | GitHub Actions — ECR push + EKS Rolling Update (**프로젝트에 포함**) |
 | [eks-simple-no-rds.md](./eks-simple-no-rds.md) | 수동 배포 상세·PVC 트러블슈팅 |
 | [git-to-eks-deployment.md](./git-to-eks-deployment.md) | Git + EKS (RDS·ALB Ingress 버전) |
 
