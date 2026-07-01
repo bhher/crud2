@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head th:replace="~{layouts/header :: head}"></head>
+<body>
+<div th:replace="~{layouts/header :: navbar}"></div>
+<h1 class="container mt-3">할 일 목록</h1>
+<table class="table container">
+	<thead>
+	<tr>
+		<th scope="col">Num</th>
+		<th scope="col">Title</th>
+		<th scope="col">Content</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr th:each="item : ${DoList}">
+		<th th:text="${item.num}">1</th>
+		<th>
+			<a th:href="@{/list/{n}(n=${item.num})}" th:text="${item.title}">title</a>
+		</th>
+		<th th:text="${item.content}">content</th>
+	</tr>
+	</tbody>
+</table>
+<div class="container">
+	<a th:href="@{/mains/add}">New</a>
+</div>
+<div th:replace="~{layouts/footer :: footer}"></div>
+</body>
+</html>

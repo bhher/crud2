@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head th:replace="~{layouts/header :: head}"></head>
+<body>
+<div th:replace="~{layouts/header :: navbar}"></div>
+<form th:action="@{/mains/create}" th:object="${doDto}" method="post" class="container">
+	<div class="mb-3">
+		<label class="form-label" for="title">제목</label>
+		<input type="text" class="form-control" id="title" th:field="*{title}">
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="content">내용</label>
+		<textarea class="form-control" id="content" rows="3" th:field="*{content}"></textarea>
+	</div>
+	<button type="submit" class="btn btn-primary">submit</button>
+	<a th:href="@{/list}">Back</a>
+</form>
+<div th:replace="~{layouts/footer :: footer}"></div>
+</body>
+</html>

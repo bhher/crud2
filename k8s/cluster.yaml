@@ -1,0 +1,13 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: crud2-cluster
+  region: ap-northeast-2
+
+nodeGroups:
+  - name: ng-1
+    instanceType: t3.medium
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 2

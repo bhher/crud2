@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head th:replace="~{layouts/header :: head}"></head>
+<body>
+<div th:replace="~{layouts/header :: navbar}"></div>
+<table class="table container" th:if="${detail != null}">
+	<thead>
+	<tr>
+		<th scope="col">Num</th>
+		<th scope="col">Title</th>
+		<th scope="col">Content</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<th th:text="${detail.num}">1</th>
+		<th th:text="${detail.title}">title</th>
+		<th th:text="${detail.content}">content</th>
+	</tr>
+	</tbody>
+</table>
+<div class="container" th:if="${detail != null}">
+	<a th:href="@{/list/{n}/edit(n=${detail.num})}" class="btn btn-primary">Edit</a>
+	<a th:href="@{/list/{n}/delete(n=${detail.num})}" class="btn btn-danger">Delete</a>
+	<a th:href="@{/list}">Go to Article List</a>
+</div>
+<div th:replace="~{layouts/footer :: footer}"></div>
+</body>
+</html>
